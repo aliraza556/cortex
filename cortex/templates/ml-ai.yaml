@@ -1,5 +1,5 @@
 name: ML/AI Stack
-description: Machine Learning and Artificial Intelligence development stack with Python, TensorFlow, PyTorch, and Jupyter
+description: Machine Learning and Artificial Intelligence development stack with Python, TensorFlow, PyTorch, and Jupyter. GPU recommended for deep learning workloads.
 version: 1.0.0
 author: Cortex Linux
 packages:
@@ -33,9 +33,9 @@ steps:
     requires_root: false
 
 hardware_requirements:
-  min_ram_mb: 4096
+  min_ram_mb: 8192
   min_cores: 4
-  min_storage_mb: 20480
+  min_storage_mb: 30720
   requires_gpu: false
   requires_cuda: false
 

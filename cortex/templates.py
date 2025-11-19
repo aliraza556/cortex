@@ -296,23 +296,31 @@ class TemplateManager:
         """List all available templates."""
         templates = {}
         
-        # List built-in templates
+        # List built-in templates (load directly from file to avoid user overrides)
         if self.templates_dir.exists():
             for ext in [".yaml", ".yml", ".json"]:
                 for template_file in self.templates_dir.glob(f"*{ext}"):
                     name = template_file.stem
+                    if name in templates:
+                        # Skip duplicate names across extensions
+                        continue
                     try:
-                        template = self.load_template(name)
-                        if template:
-                            templates[name] = {
-                                "name": template.name,
-                                "description": template.description,
-                                "version": template.version,
-                                "author": template.author,
-                                "type": "built-in",
-                                "path": str(template_file)
-                            }
+                        with open(template_file, 'r', encoding='utf-8') as f:
+                            if template_file.suffix in ['.yaml', '.yml']:
+                                data = yaml.safe_load(f)
+                            else:
+                                data = json.load(f)
+                        template = Template.from_dict(data)
+                        templates[name] = {
+                            "name": template.name,
+                            "description": template.description,
+                            "version": template.version,
+                            "author": template.author,
+                            "type": "built-in",
+                            "path": str(template_file)
+                        }
                     except Exception:
+                        # Ignore malformed built-ins but continue listing others
                         pass
         
         # List user templates

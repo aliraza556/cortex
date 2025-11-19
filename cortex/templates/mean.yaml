@@ -13,26 +13,35 @@ steps:
   - command: apt update
     description: Update package lists
     requires_root: true
-  - command: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-    description: Add Node.js repository
+  - command: curl -fsSL https://deb.nodesource.com/setup_20.x -o /tmp/nodesource_setup.sh && bash /tmp/nodesource_setup.sh && rm /tmp/nodesource_setup.sh
+    description: Download and add Node.js repository
     requires_root: true
   - command: apt install -y nodejs
     description: Install Node.js
     requires_root: true
   - command: npm install -g @angular/cli express-generator
     description: Install Angular CLI and Express generator globally
-    requires_root: false
-  - command: apt install -y mongodb
-    description: Install MongoDB
     requires_root: true
-  - command: systemctl start mongodb
+  - command: curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
+    description: Import MongoDB GPG key
+    requires_root: true
+  - command: echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/8.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+    description: Add MongoDB official apt repository
+    requires_root: true
+  - command: apt update
+    description: Update package lists
+    requires_root: true
+  - command: apt install -y mongodb-org
+    description: Install MongoDB from official repository
+    requires_root: true
+  - command: systemctl start mongod
     description: Start MongoDB service
     requires_root: true
-    rollback: systemctl stop mongodb
-  - command: systemctl enable mongodb
+    rollback: systemctl stop mongod
+  - command: systemctl enable mongod
     description: Enable MongoDB on boot
     requires_root: true
-    rollback: systemctl disable mongodb
+    rollback: systemctl disable mongod
 
 hardware_requirements:
   min_ram_mb: 2048
@@ -49,8 +58,8 @@ post_install:
 verification_commands:
   - node --version
   - npm --version
-  - mongod --version
-  - systemctl is-active mongodb
+  - mongosh --version || mongo --version
+  - systemctl is-active mongod
   - ng version
 
 metadata:

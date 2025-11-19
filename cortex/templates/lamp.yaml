@@ -18,11 +18,17 @@ steps:
   - command: apt update
     description: Update package lists
     requires_root: true
-  - command: apt install -y apache2 mysql-server mysql-client php php-mysql php-mbstring php-xml php-curl libapache2-mod-php
+  - command: echo "mysql-server mysql-server/root_password password temp_password" | debconf-set-selections && echo "mysql-server mysql-server/root_password_again password temp_password" | debconf-set-selections
+    description: Pre-configure MySQL root password
+    requires_root: true
+  - command: DEBIAN_FRONTEND=noninteractive apt install -y apache2 mysql-server mysql-client php php-mysql php-mbstring php-xml php-curl libapache2-mod-php
     description: Install LAMP stack packages
     requires_root: true
-  - command: apt install -y phpmyadmin
-    description: Install phpMyAdmin
+  - command: echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | debconf-set-selections && echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2" | debconf-set-selections && DEBIAN_FRONTEND=noninteractive apt install -y phpmyadmin
+    description: Install and configure phpMyAdmin for Apache
+    requires_root: true
+  - command: ln -sf /usr/share/phpmyadmin /var/www/html/phpmyadmin
+    description: Create phpMyAdmin symlink
     requires_root: true
   - command: systemctl start apache2
     description: Start Apache web server
@@ -48,8 +54,11 @@ hardware_requirements:
 
 post_install:
   - echo "LAMP stack installed successfully"
+  - echo "SECURITY: Run 'mysql_secure_installation' to secure MySQL"
+  - echo "SECURITY: Configure firewall rules for production use"
   - echo "Apache: http://localhost"
   - echo "phpMyAdmin: http://localhost/phpmyadmin"
+  - echo "SECURITY: Change default MySQL passwords before production use"
 
 verification_commands:
   - apache2 -v

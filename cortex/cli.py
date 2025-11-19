@@ -298,7 +298,7 @@ class CortexCLI:
             # Check hardware compatibility
             is_compatible, warnings = template_manager.check_hardware_compatibility(template)
             if warnings:
-                print(f"\n[WARNING] Hardware Compatibility Warnings:")
+                print("\n[WARNING] Hardware Compatibility Warnings:")
                 for warning in warnings:
                     print(f"   - {warning}")
                 if not is_compatible and not dry_run:
@@ -391,21 +391,15 @@ class CortexCLI:
                                 status = "[OK]" if passed else "[FAIL]"
                                 print(f"  {status} {cmd}")
                     
-                    # Run post-install commands
+                    # Run post-install commands once
                     if template.post_install:
                         self._print_status("[*]", "Running post-installation steps...")
+                        print("\n[*] Post-installation information:")
                         for cmd in template.post_install:
                             subprocess.run(cmd, shell=True)
                     
                     self._print_success(f"{template.name} stack ready!")
                     print(f"\nCompleted in {result.total_duration:.2f} seconds")
-                    
-                    # Display post-install info
-                    if template.post_install:
-                        print("\n[*] Post-installation information:")
-                        for cmd in template.post_install:
-                            if cmd.startswith("echo"):
-                                subprocess.run(cmd, shell=True)
                     
                     # Record successful installation
                     if install_id:
@@ -445,7 +439,7 @@ class CortexCLI:
                 history.update_installation(install_id, InstallationStatus.FAILED, str(e))
             self._print_error(str(e))
             return 1
-        except Exception as e:
+        except (RuntimeError, OSError, subprocess.SubprocessError) as e:
             if install_id:
                 history.update_installation(install_id, InstallationStatus.FAILED, str(e))
             self._print_error(f"Unexpected error: {str(e)}")
