@@ -19,8 +19,9 @@ import yaml
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from cortex.packages import PackageManager, PackageManagerType
 from src.hwprofiler import HardwareProfiler
+
+from cortex.packages import PackageManager, PackageManagerType
 
 
 class TemplateFormat(Enum):
@@ -378,7 +379,7 @@ class TemplateManager:
                         # Skip duplicate names across extensions
                         continue
                     try:
-                        with open(template_file, "r", encoding="utf-8") as f:
+                        with open(template_file, encoding="utf-8") as f:
                             if template_file.suffix in [".yaml", ".yml"]:
                                 data = yaml.safe_load(f)
                             else:
