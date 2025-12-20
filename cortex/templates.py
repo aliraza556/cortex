@@ -19,8 +19,7 @@ import yaml
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from src.hwprofiler import HardwareProfiler
-
+from cortex.hwprofiler import HardwareProfiler
 from cortex.packages import PackageManager, PackageManagerType
 
 
