@@ -231,7 +231,9 @@ class CortexCLI:
         """Describe a specific stack (legacy simple stacks)."""
         stack = manager.find_stack(stack_id)
         if not stack:
-            self._print_error(f"Stack '{stack_id}' not found. Use 'cortex stack list' to see available stacks.")
+            self._print_error(
+                f"Stack '{stack_id}' not found. Use 'cortex stack list' to see available stacks."
+            )
             return 1
         description = manager.describe_stack(stack_id)
         console.print(description)
@@ -2063,9 +2065,7 @@ Examples:
             return cli.ask(args.question)
         elif args.command == "install":
             if args.stack:
-                return cli.install(
-                    "", execute=args.execute, dry_run=args.dry_run, stack=args.stack
-                )
+                return cli.install("", execute=args.execute, dry_run=args.dry_run, stack=args.stack)
             else:
                 # software is guaranteed to be set due to mutually_exclusive_group(required=True)
                 return cli.install(
@@ -2080,9 +2080,7 @@ Examples:
             return cli.rollback(args.id, dry_run=args.dry_run)
         elif args.command == "template":
             # DEPRECATED: Redirect to stack commands with warning
-            cx_print(
-                "⚠️  'cortex template' is deprecated. Use 'cortex stack' instead.", "warning"
-            )
+            cx_print("⚠️  'cortex template' is deprecated. Use 'cortex stack' instead.", "warning")
             if args.template_action == "list":
                 cx_print("   Use: cortex stack list", "info")
                 return cli.stack_list()
